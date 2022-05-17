@@ -2,8 +2,11 @@
 #include "tp_sysit_feather.h"
 #include <LiquidCrystal.h>
 #include <ACAN2515.h>
+#include <wiring_private.h>
 
 #include "can_messages.h"
+
+#include "mqtt.h"
 
 const byte BUTTON_P0 = 0 ;
 const byte BUTTON_P1 = 1 ;

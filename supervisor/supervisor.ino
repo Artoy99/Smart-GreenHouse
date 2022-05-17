@@ -4,6 +4,7 @@ LiquidCrystal lcd(18, 17, 16, 15, 14, 19);
 
 void setup(){
   beginIO();
+  mqttSetup();
 }
 
 void loop(){

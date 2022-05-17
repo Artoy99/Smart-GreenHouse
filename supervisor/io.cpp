@@ -1,9 +1,5 @@
 #include "io.h"
 extern LiquidCrystal lcd;
-#include <ACAN2515.h>
-#include <wiring_private.h>
-
-#include "can_messages.h"
 
 static const uint32_t QUARTZ_FREQUENCY = 16 * 1000 * 1000 ; // 16 MHz
 
@@ -20,38 +16,40 @@ ACAN2515 can (CAN_CS, mySPI, CAN_INT) ;
 
 //----------------------------------------Init---------------------------------------
 
-void beginIO(void){
+void beginIO(void) {
   //--- Switch on builtin led
   pinMode (LED_BUILTIN, OUTPUT) ;
   digitalWrite (LED_BUILTIN, HIGH) ;
 
   //--- Configure LCD
   lcd.begin(20, 4); // 20 colonnes et 4 lignes lcd . setCursor (0 , 3);
-  lcd.setCursor(4,0);
+  lcd.setCursor(4, 0);
   lcd.print("Ramirez");
 
   //--- Configure SPI
   mySPI.begin () ;
-  
+
   //--- Define alternate pins for SPI
   pinPeripheral (MCP2515_SI, PIO_SERCOM);
   pinPeripheral (MCP2515_SCK, PIO_SERCOM);
   pinPeripheral (MCP2515_SO, PIO_SERCOM);
-  
+
   Serial.begin(9600);
   //--- Wait for serial (blink led at 10 Hz during waiting)
   while (!Serial) {
     delay (50) ;
     digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
   }
-  
+
   Serial1.begin (19200);
   //--- Wait for serial1 (blink led at 10 Hz during waiting)
   while (!Serial1) {
     delay (50) ;
     digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
   }
+  //--- Can configuration
   ACAN2515Settings settings (QUARTZ_FREQUENCY, 125 * 1000) ;
+  //ACAN2515Settings settings (QUARTZ_FREQUENCY, 111111) ;
   //settings.mRequestedMode = ACAN2515Settings::LoopBackMode ; // Select loopback mode
   const uint32_t errorCode = can.begin (settings, [] { can.isr () ; }) ;
   if (errorCode == 0) {
@@ -75,37 +73,18 @@ void beginIO(void){
     Serial.print ("Sample point: ") ;
     Serial.print (settings.samplePointFromBitStart ()) ;
     Serial.println ("%") ;
-  }else{
+  } else {
     Serial.print ("Configuration error 0x") ;
     Serial.println (errorCode, HEX) ;
   }
 }
 
-//----------------------------------------Serial---------------------------------------
-
-void readSerial(void){
-  byte incomingByte;
-  while(Serial1.available()){
-    incomingByte = Serial1.read();
-
-    for(int i=0; i<3; i++){
-      valueButton[i] = incomingByte&(1<<i);
-    }
-    if(incomingByte&(1<<4)){
-      valueEncoder++;
-    }
-    if(incomingByte&(1<<5)){
-      valueEncoder--;
-    }
-  }
-}
-
 //----------------------------------------CAN---------------------------------------
 
-void readCAN(void){
+void readCAN(void) {
   CANMessage frame;
-  
-  if (can.available()){
+
+  if (can.available()) {
     can.receive (frame) ;
     Serial.print("Received, id = ") ;
     Serial.print(frame.id, HEX);
@@ -113,14 +92,14 @@ void readCAN(void){
     Serial.println(frame.len);
 
     Serial.print("reception, data:");
-    for(int i = 0; i < 8; i++){
+    for (int i = 0; i < 8; i++) {
       Serial.print(frame.data[i]);
     }
     Serial.println("");
   }
 }
 
-void sendCAN(uint8_t sender_id, uint8_t receiver_id, uint8_t code_message, uint8_t frame_id){
+void sendCAN(uint8_t sender_id, uint8_t receiver_id, uint8_t code_message, uint8_t frame_id) {
   CANMessage frame;
   frame.id = frame_id;
   frame.len = CAN_LENGTH;
@@ -133,17 +112,17 @@ void sendCAN(uint8_t sender_id, uint8_t receiver_id, uint8_t code_message, uint8
   frame.data[5] = 1;
   frame.data[6] = 0;
   frame.data[7] = 1;
-  
-  if(can.tryToSend(frame)){
+
+  if (can.tryToSend(frame)) {
     Serial.print("trame envoyée, data:");
-    for(int i = 0; i < 8; i++){
+    for (int i = 0; i < 8; i++) {
       Serial.print(frame.data[i]);
     }
     Serial.println("");
   }
-  else{
+  else {
     Serial.print("erreur sur trame, data:");
-    for(int i = 0; i < 8; i++){
+    for (int i = 0; i < 8; i++) {
       Serial.print(frame.data[i]);
     }
     Serial.println("");
