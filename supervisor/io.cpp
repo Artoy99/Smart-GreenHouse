@@ -54,7 +54,7 @@ void beginIO(void) {
   #ifdef LOOPBACK
   settings.mRequestedMode = ACAN2515Settings::LoopBackMode ; // Select loopback mode
   #endif
-  const ACAN2515Mask rxm0 = standard2515Mask (0x7FF, 0, 0) ;
+  const ACAN2515Mask rxm0 = standard2515Mask (0x7FF, 0xFF, 0) ;
   const ACAN2515Mask rxm1 = standard2515Mask (0, 0xFF, 0) ;
   const ACAN2515AcceptanceFilter filters [] = {
     {standard2515Filter (PERIODICAL_DATA, ID_FEATHER, 0), receive0},
