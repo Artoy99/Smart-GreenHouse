@@ -1,7 +1,7 @@
 #include "mqtt.h"
 
 WiFiClient WiFiclient; // instantciation d ’ un client WiFi non - SSL
-PubSubClient client(WiFiclient); // Utilise le WiFi pour la communication MQTT
+PubSubClient mqttClient(WiFiclient); // Utilise le WiFi pour la communication MQTT
 
 // Chaque client MQTT doit avoir un ID unique
 String device_id = "FeatherM0-F8:F0:05:F7:4C:A3" ; // Ajouter par exemple l ’ adresse MAC
@@ -37,8 +37,9 @@ void mqttSetup(void){
   printCurrentNet();
   printWiFiData();
 
-  client.setServer(MQTT_BROKER, MQTT_PORT) ; // parametres du broker
-  client.setCallback(callback) ; // fonction d ’ appel pour traiter les messages
+  mqttClient.setServer(MQTT_BROKER, MQTT_PORT) ; // parametres du broker
+  mqttClient.setCallback(callback) ; // fonction d ’ appel pour traiter les messages
+  reconnect();
 }
 
 void printWiFiData() {
@@ -53,7 +54,6 @@ void printWiFiData() {
   WiFi.macAddress(mac);
   Serial.print("MAC address: ");
   printMacAddress(mac);
-
 }
 
 void printCurrentNet() {
@@ -104,19 +104,19 @@ void callback ( char *topic , byte *payload , unsigned int length ) {
 
 void reconnect() {
   // Loop until we're reconnected
-  while (!client.connected()) {
+  while (!mqttClient.connected()) {
     Serial.print("Attempting MQTT connection...");
     // Attempt to connect
-    if (client.connect("arthurClient", "", "", "arthur/will", 0, true, "last will arthur")) {
+    if (mqttClient.connect("arthurClient", "", "", "arthur/will", 0, true, "last will arthur")) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      client.publish("arthur/a","hello world");
+      mqttClient.publish("arthur/a","hello world");
       // ... and resubscribe
-      client.subscribe("arthur/hello");
-      client.loop();
+      mqttClient.subscribe("arthur/hello");
+      mqttClient.loop();
     }else{
       Serial.print("failed, rc=");
-      Serial.print(client.state());
+      Serial.print(mqttClient.state());
       Serial.println(" try again in 5 seconds");
       // Wait 5 seconds before retrying
       delay(5000);

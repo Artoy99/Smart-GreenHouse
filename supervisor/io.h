@@ -26,7 +26,7 @@ void beginIO (void) ;
 
 void readCAN(void);
 
-void sendCAN(uint8_t sender_id, uint8_t receiver_id, uint8_t code_message, uint8_t frame_id);
+void sendCAN(uint8_t receiver_id, uint8_t sender_id, uint8_t frame_id, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3);
 
 static void receive0 (const CANMessage & inMessage);
 

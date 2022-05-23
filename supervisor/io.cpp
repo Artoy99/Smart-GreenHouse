@@ -24,7 +24,7 @@ void beginIO(void) {
 
   //--- Configure LCD
   lcd.begin(20, 4); // 20 colonnes et 4 lignes lcd . setCursor (0 , 3);
-  lcd.setCursor(4, 0);
+  lcd.setCursor(0, 0);
   lcd.print("Ramirez");
 
   //--- Configure SPI
@@ -59,9 +59,10 @@ void beginIO(void) {
   const ACAN2515AcceptanceFilter filters [] = {
     {standard2515Filter (PERIODICAL_DATA, ID_FEATHER, 0), receive0},
     {standard2515Filter (PERIODICAL_DATA, ID_FEATHER, 0), receive0},
-    {standard2515Filter (0, ID_FEATHER, 0), receive1}
+    {standard2515Filter (0, ID_FEATHER, 0), receive1},
+    {standard2515Filter (0, 0, 0), receive2}
   } ;
-  const uint32_t errorCode = can.begin (settings, [] { can.isr () ; }, rxm0, rxm1, filters, 3);
+  const uint32_t errorCode = can.begin (settings, [] { can.isr () ; }, rxm0, rxm1, filters, 4);
   if (errorCode == 0) {
     Serial.println ("") ;
     Serial.print ("Bit Rate prescaler: ") ;
@@ -113,25 +114,30 @@ void readCAN(void) {
 
 //——————————————————————————————————————————————————————————————————————————————
 
-void sendCAN(uint8_t sender_id, uint8_t receiver_id, uint8_t code_message, uint8_t frame_id) {
+void sendCAN(uint8_t receiver_id, uint8_t sender_id, uint8_t frame_id, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3) {
   CANMessage frame;
   frame.id = frame_id;
+
+  frame.data[0] = receiver_id;
+  frame.data[1] = sender_id;
+  frame.data[2] = 0;
+  frame.data[3] = 1;
+  frame.data[4] = data0;
+  frame.data[5] = data1;
+  frame.data[6] = data2;
+  frame.data[7] = data3;
+
   frame.len = CAN_LENGTH;
 
-  frame.data[0] = sender_id;
-  frame.data[1] = receiver_id;
-  frame.data[2] = code_message;
-  frame.data[3] = 1;
-  frame.data[4] = 0;
-  frame.data[5] = 1;
-  frame.data[6] = 0;
-  frame.data[7] = 1;
-
   if (can.tryToSend(frame)) {
-    Serial.print("trame envoyée, data:");
+    Serial.print("trame envoyée, frame.id: ");
+    Serial.println(frame.id, HEX);
+    Serial.print("data: ");
     for (int i = 0; i < 8; i++) {
-      Serial.print(frame.data[i]);
+      Serial.print(frame.data[i], HEX);
+      Serial.print(";");
     }
+    Serial.println("");
     Serial.println("");
   }
   else {
@@ -140,6 +146,7 @@ void sendCAN(uint8_t sender_id, uint8_t receiver_id, uint8_t code_message, uint8
       Serial.print(frame.data[i]);
     }
     Serial.println("");
+    Serial.println("");
   }
 }
 
@@ -147,12 +154,29 @@ void sendCAN(uint8_t sender_id, uint8_t receiver_id, uint8_t code_message, uint8
 
 static void receive0 (const CANMessage & inMessage) {
   Serial.println ("Receive 0") ;
+  Serial.print("inMessage.id: ");
+  Serial.println(inMessage.id);
+  Serial.print("inMessage.data[7]: ");
+  Serial.println(inMessage.data[7]);
+  Serial.println("");
+  
+  mqttClient.publish("arthur/receive0", "Receive 0");
+  mqttClient.loop();
+  
 }
 
 //——————————————————————————————————————————————————————————————————————————————
 
 static void receive1 (const CANMessage & inMessage) {
   Serial.println ("Receive 1") ;
+  Serial.print("inMessage.id: ");
+  Serial.println(inMessage.id);
+  Serial.print("inMessage.data[7]: ");
+  Serial.println(inMessage.data[7]);
+  Serial.println("");
+  
+  mqttClient.publish("arthur/receive1", "Receive 1");
+  mqttClient.loop();
 }
 
 //——————————————————————————————————————————————————————————————————————————————
