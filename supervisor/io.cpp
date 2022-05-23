@@ -27,14 +27,6 @@ void beginIO(void) {
   lcd.setCursor(0, 0);
   lcd.print("Ramirez");
 
-  //--- Configure SPI
-  mySPI.begin () ;
-
-  //--- Define alternate pins for SPI
-  pinPeripheral (MCP2515_SI, PIO_SERCOM);
-  pinPeripheral (MCP2515_SCK, PIO_SERCOM);
-  pinPeripheral (MCP2515_SO, PIO_SERCOM);
-
   Serial.begin(9600);
   //--- Wait for serial (blink led at 10 Hz during waiting)
   while (!Serial) {
@@ -48,7 +40,17 @@ void beginIO(void) {
     delay (50) ;
     digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
   }
+
+  //--- Configure SPI
+  mySPI.begin () ;
+
+  //--- Define alternate pins for SPI
+  pinPeripheral (MCP2515_SI, PIO_SERCOM);
+  pinPeripheral (MCP2515_SCK, PIO_SERCOM);
+  pinPeripheral (MCP2515_SO, PIO_SERCOM);
+
   //--- Can configuration
+  Serial.println ("Configure ACAN2515") ;
   ACAN2515Settings settings (QUARTZ_FREQUENCY, 125 * 1000) ;
   //ACAN2515Settings settings (QUARTZ_FREQUENCY, 111111) ;
   #ifdef LOOPBACK
