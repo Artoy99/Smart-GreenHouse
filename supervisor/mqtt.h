@@ -5,6 +5,9 @@
 #include <WiFi101.h>
 #include <PubSubClient.h>
 
+#define MQTT_BROKER "10.3.141.1" // Addresse du broker MQTT ( IP or URL )
+#define MQTT_PORT 1883 // port 1883 pour la connexion non securisee
+
 void mqttSetup(void);
 
 void printWiFiData(void);

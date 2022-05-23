@@ -1,5 +1,6 @@
 #include "io.h"
-extern LiquidCrystal lcd;
+
+LiquidCrystal lcd(18, 17, 16, 15, 14, 19);
 
 static const uint32_t QUARTZ_FREQUENCY = 16 * 1000 * 1000 ; // 16 MHz
 
@@ -7,12 +8,12 @@ static const byte MCP2515_SCK = 12 ; // SCK pin, SCK input of MCP2515
 static const byte MCP2515_SI  = 11 ; // MOSI pin, SI input of MCP2515
 static const byte MCP2515_SO  = 10 ; // MISO pin, SO output of MCP2515
 
-SPIClass mySPI (&sercom1, MCP2515_SO, MCP2515_SI, MCP2515_SCK, SPI_PAD_0_SCK_3, SERCOM_RX_PAD_2);
-
 static const byte CAN_CS  =  6 ; // CS input of MCP2515
 static const byte CAN_INT =  5 ; // INT output of MCP2515
 
-ACAN2515 can (CAN_CS, mySPI, CAN_INT) ;
+SPIClass mySPI (&sercom1, MCP2515_SO, MCP2515_SI, MCP2515_SCK, SPI_PAD_0_SCK_3, SERCOM_RX_PAD_2);
+
+ACAN2515 can (CAN_CS, mySPI, CAN_INT);
 
 //----------------------------------------Init---------------------------------------
 
@@ -50,9 +51,19 @@ void beginIO(void) {
   //--- Can configuration
   ACAN2515Settings settings (QUARTZ_FREQUENCY, 125 * 1000) ;
   //ACAN2515Settings settings (QUARTZ_FREQUENCY, 111111) ;
-  //settings.mRequestedMode = ACAN2515Settings::LoopBackMode ; // Select loopback mode
-  const uint32_t errorCode = can.begin (settings, [] { can.isr () ; }) ;
+  #ifdef LOOPBACK
+  settings.mRequestedMode = ACAN2515Settings::LoopBackMode ; // Select loopback mode
+  #endif
+  const ACAN2515Mask rxm0 = standard2515Mask (0x7FF, 0, 0) ;
+  const ACAN2515Mask rxm1 = standard2515Mask (0, 0xFF, 0) ;
+  const ACAN2515AcceptanceFilter filters [] = {
+    {standard2515Filter (PERIODICAL_DATA, ID_FEATHER, 0), receive0},
+    {standard2515Filter (PERIODICAL_DATA, ID_FEATHER, 0), receive0},
+    {standard2515Filter (0, ID_FEATHER, 0), receive1}
+  } ;
+  const uint32_t errorCode = can.begin (settings, [] { can.isr () ; }, rxm0, rxm1, filters, 3);
   if (errorCode == 0) {
+    Serial.println ("") ;
     Serial.print ("Bit Rate prescaler: ") ;
     Serial.println (settings.mBitRatePrescaler) ;
     Serial.print ("Propagation Segment: ") ;
@@ -73,13 +84,14 @@ void beginIO(void) {
     Serial.print ("Sample point: ") ;
     Serial.print (settings.samplePointFromBitStart ()) ;
     Serial.println ("%") ;
+    Serial.println ("") ;
   } else {
     Serial.print ("Configuration error 0x") ;
     Serial.println (errorCode, HEX) ;
   }
 }
 
-//----------------------------------------CAN---------------------------------------
+//———————————————————————————————————CAN————————————————————————————————————————
 
 void readCAN(void) {
   CANMessage frame;
@@ -98,6 +110,8 @@ void readCAN(void) {
     Serial.println("");
   }
 }
+
+//——————————————————————————————————————————————————————————————————————————————
 
 void sendCAN(uint8_t sender_id, uint8_t receiver_id, uint8_t code_message, uint8_t frame_id) {
   CANMessage frame;
@@ -128,3 +142,23 @@ void sendCAN(uint8_t sender_id, uint8_t receiver_id, uint8_t code_message, uint8
     Serial.println("");
   }
 }
+
+//——————————————————————————————————————————————————————————————————————————————
+
+static void receive0 (const CANMessage & inMessage) {
+  Serial.println ("Receive 0") ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————
+
+static void receive1 (const CANMessage & inMessage) {
+  Serial.println ("Receive 1") ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————
+
+static void receive2 (const CANMessage & inMessage) {
+  Serial.println ("Receive 2") ;
+}
+
+//——————————————————————————————————————————————————————————————————————————————

@@ -1,13 +1,56 @@
 #include "io.h"
 
-LiquidCrystal lcd(18, 17, 16, 15, 14, 19);
-
 void setup(){
   beginIO();
   mqttSetup();
 }
 
+#ifdef LOOPBACK
+static uint32_t gBlinkLedDate = 0 ;
+static uint32_t gSentFrameCount = 0 ;
+static uint8_t gTransmitBufferIndex = 0 ;
+#endif
+
 void loop(){
-  //sendCAN(ID_FEATHER, ID_FEATHER, DATA_REQUEST, 0x44);
-  readCAN();
+  can.dispatchReceivedMessage();
+
+  #ifdef LOOPBACK
+  CANMessage frame ;
+  if (gBlinkLedDate < millis ()) {
+    gBlinkLedDate += 2000 ;
+    digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
+    frame.idx = gTransmitBufferIndex ;
+    gTransmitBufferIndex = (gTransmitBufferIndex + 1) % 3 ;
+    switch (gSentFrameCount % 4) {
+    case 0 :  // Matches filter #0
+      frame.id = PERIODICAL_DATA ;
+      frame.data [0] = ID_FEATHER ;
+      frame.len = CAN_LENGTH ;
+      break ;
+    case 1 :  // Matches filter #1
+      frame.id = BOARD_ID_CONFIGURATION ;
+      frame.data [0] = ID_FEATHER ;
+      frame.len = CAN_LENGTH ;
+      break ;
+    case 2 :  // Matches filter #1
+      frame.id = 0x564 ;
+      frame.data [0] = ID_FEATHER ;
+      frame.len = 1 ;
+      break ;
+    case 3 :  // Does not match any filter
+      frame.id = 0x564 ;
+      frame.data [0] = 0x57 ;
+      frame.len = 1 ;
+      break ;
+    }
+    const bool ok = can.tryToSend (frame) ;
+    if (ok) {
+      gSentFrameCount += 1 ;
+      Serial.print ("Sent: ") ;
+      Serial.println (gSentFrameCount) ;
+    }else{
+      Serial.println ("Send failure") ;
+    }
+  }
+  #endif
 }

@@ -1,13 +1,13 @@
 #include "mqtt.h"
 
-#define MQTT_BROKER "10.3.141.1" // Addresse du broker MQTT ( IP or URL )
-#define MQTT_PORT 1883 // port 1883 pour la connexion non securisee
 WiFiClient WiFiclient; // instantciation d ’ un client WiFi non - SSL
 PubSubClient client(WiFiclient); // Utilise le WiFi pour la communication MQTT
+
 // Chaque client MQTT doit avoir un ID unique
-String device_id = "FeatherM0-F8:F0:05:F1:F9:78" ; // Ajouter par exemple l ’ adresse MAC
+String device_id = "FeatherM0-F8:F0:05:F7:4C:A3" ; // Ajouter par exemple l ’ adresse MAC
+
 #include "arduino_secrets.h" 
-///////please enter your sensitive data in the Secret tab/arduino_secrets.h
+//please enter your sensitive data in the Secret tab/arduino_secrets.h
 char ssid[] = SECRET_SSID;        // your network SSID (name)
 char pass[] = SECRET_PASS;    // your network password (use for WPA, or use as key for WEP)
 int statusWIFI = WL_IDLE_STATUS;     // the WiFi radio's status
