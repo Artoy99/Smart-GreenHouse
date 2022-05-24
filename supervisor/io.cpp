@@ -160,7 +160,28 @@ static void receive0 (const CANMessage & inMessage) {
   Serial.print("inMessage.data[7]: ");
   Serial.println(inMessage.data[7], HEX);
   Serial.println("");
-  
+
+  if(inMessage.len == CAN_LENGTH){
+    switch (inMessage.data[1]) {
+      case ID_STM32_1:
+        mqttClient.publish("arthur/STM32_1/THERM/PERIODICAL_DATA", "Receive");
+        mqttClient.loop();
+        break;
+      case ID_STM32_2:
+        if(inMessage.data[2] == CO2_DATA){
+          mqttClient.publish("arthur/STM32_2/CO2/PERIODICAL_DATA", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.data[2] == HUM_DATA){
+          mqttClient.publish("arthur/STM32_2/HUM/PERIODICAL_DATA", "Receive");
+          mqttClient.loop();
+        }
+        break;
+      default:
+        mqttClient.publish("arthur/PERIODICAL_DATA", "Unknown sender");
+        mqttClient.loop();
+        break;
+    }
+  }
   mqttClient.publish("arthur/receive0", "Receive 0");
   mqttClient.loop();
   
@@ -169,30 +190,91 @@ static void receive0 (const CANMessage & inMessage) {
 //——————————————————————————————————————————————————————————————————————————————
 
 static void receive1 (const CANMessage & inMessage) {
-  Serial.println ("Receive 1") ;
+  /*Serial.println ("Receive 1") ;
   Serial.print("inMessage.id: ");
   Serial.println(inMessage.id, HEX);
   Serial.print("inMessage.data[7]: ");
   Serial.println(inMessage.data[7], HEX);
-  Serial.println("");
+  Serial.println("");*/
 
-  /*if(inMessage.len == CAN_LENGTH){
+  if(inMessage.len == CAN_LENGTH){
     switch (inMessage.data[1]) {
-      case ID_STM32-1:
-        mqttClient.publish("arthur/STM32-1", "Receive");
-        mqttClient.loop();
+      case ID_STM32_1:
+        if(inMessage.id == DATA_REQUEST){
+          mqttClient.publish("arthur/STM32_1/DATA_REQUEST", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == ACTUATOR_COMMAND){
+          mqttClient.publish("arthur/STM32_1/ACTUATOR_COMMAND", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == PERIOD_CONFIGURATION){
+          mqttClient.publish("arthur/STM32_1/PERIOD_CONFIGURATION", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == BOARD_ID_CONFIGURATION){
+          mqttClient.publish("arthur/STM32_1/BOARD_ID_CONFIGURATION", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == READ_BOARD_ID){
+          mqttClient.publish("arthur/STM32_1/READ_BOARD_ID", "Receive");
+          mqttClient.loop();
+        }
         break;
-      case ID_STM32-2:
-        mqttClient.publish("arthur/STM32-2", "Receive");
-        mqttClient.loop();
+      case ID_STM32_2:
+        if(inMessage.id == DATA_REQUEST){
+          mqttClient.publish("arthur/STM32_2/DATA_REQUEST", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == ACTUATOR_COMMAND){
+          mqttClient.publish("arthur/STM32_2/ACTUATOR_COMMAND", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == PERIOD_CONFIGURATION){
+          mqttClient.publish("arthur/STM32_2/PERIOD_CONFIGURATION", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == BOARD_ID_CONFIGURATION){
+          mqttClient.publish("arthur/STM32_2/BOARD_ID_CONFIGURATION", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == READ_BOARD_ID){
+          mqttClient.publish("arthur/STM32_2/READ_BOARD_ID", "Receive");
+          mqttClient.loop();
+        }
         break;
-      case ID_STM32-3:
-        mqttClient.publish("arthur/STM32-3", "Receive");
-        mqttClient.loop();
+      case ID_STM32_3:
+        if(inMessage.id == DATA_REQUEST){
+          mqttClient.publish("arthur/STM32_3/DATA_REQUEST", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == ACTUATOR_COMMAND){
+          mqttClient.publish("arthur/STM32_3/ACTUATOR_COMMAND", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == PERIOD_CONFIGURATION){
+          mqttClient.publish("arthur/STM32_3/PERIOD_CONFIGURATION", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == BOARD_ID_CONFIGURATION){
+          mqttClient.publish("arthur/STM32_3/BOARD_ID_CONFIGURATION", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == READ_BOARD_ID){
+          mqttClient.publish("arthur/STM32_3/READ_BOARD_ID", "Receive");
+          mqttClient.loop();
+        }
         break;
-    }*/
-    mqttClient.publish("arthur/receive1", "Receive 1");
-    mqttClient.loop();
+      case ID_BASYS3:
+        if(inMessage.id == DATA_REQUEST){
+          mqttClient.publish("arthur/BASYS3/DATA_REQUEST", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == ACTUATOR_COMMAND){
+          mqttClient.publish("arthur/BASYS3/ACTUATOR_COMMAND", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == PERIOD_CONFIGURATION){
+          mqttClient.publish("arthur/BASYS3/PERIOD_CONFIGURATION", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == BOARD_ID_CONFIGURATION){
+          mqttClient.publish("arthur/BASYS3/BOARD_ID_CONFIGURATION", "Receive");
+          mqttClient.loop();
+        }else if(inMessage.id == READ_BOARD_ID){
+          mqttClient.publish("arthur/BASYS3/READ_BOARD_ID", "Receive");
+          mqttClient.loop();
+        }
+        break;
+    }
+  }
+  mqttClient.publish("arthur/receive1", "Receive 1");
+  mqttClient.loop();
 }
 
 //——————————————————————————————————————————————————————————————————————————————

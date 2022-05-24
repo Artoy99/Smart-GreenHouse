@@ -15,7 +15,9 @@ static uint8_t gTransmitBufferIndex = 0 ;
 
 
 void loop(){
-  can.dispatchReceivedMessage();
+  
+  while(can.dispatchReceivedMessage())
+  {}
 
   //CANMessage frame ;
   if (gBlinkLedDate < millis ()) {
