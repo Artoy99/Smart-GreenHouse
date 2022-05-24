@@ -61,10 +61,9 @@ void beginIO(void) {
   const ACAN2515AcceptanceFilter filters [] = {
     {standard2515Filter (PERIODICAL_DATA, ID_FEATHER, 0), receive0},
     {standard2515Filter (PERIODICAL_DATA, ID_FEATHER, 0), receive0},
-    {standard2515Filter (0, ID_FEATHER, 0), receive1},
-    {standard2515Filter (0, 0, 0), receive2}
+    {standard2515Filter (0, ID_FEATHER, 0), receive1}
   } ;
-  const uint32_t errorCode = can.begin (settings, [] { can.isr () ; }, rxm0, rxm1, filters, 4);
+  const uint32_t errorCode = can.begin (settings, [] { can.isr () ; }, rxm0, rxm1, filters, 3);
   if (errorCode == 0) {
     Serial.println ("") ;
     Serial.print ("Bit Rate prescaler: ") ;
@@ -157,9 +156,9 @@ void sendCAN(uint8_t receiver_id, uint8_t sender_id, uint8_t frame_id, uint8_t d
 static void receive0 (const CANMessage & inMessage) {
   Serial.println ("Receive 0") ;
   Serial.print("inMessage.id: ");
-  Serial.println(inMessage.id);
+  Serial.println(inMessage.id, HEX);
   Serial.print("inMessage.data[7]: ");
-  Serial.println(inMessage.data[7]);
+  Serial.println(inMessage.data[7], HEX);
   Serial.println("");
   
   mqttClient.publish("arthur/receive0", "Receive 0");
@@ -172,19 +171,28 @@ static void receive0 (const CANMessage & inMessage) {
 static void receive1 (const CANMessage & inMessage) {
   Serial.println ("Receive 1") ;
   Serial.print("inMessage.id: ");
-  Serial.println(inMessage.id);
+  Serial.println(inMessage.id, HEX);
   Serial.print("inMessage.data[7]: ");
-  Serial.println(inMessage.data[7]);
+  Serial.println(inMessage.data[7], HEX);
   Serial.println("");
-  
-  mqttClient.publish("arthur/receive1", "Receive 1");
-  mqttClient.loop();
-}
 
-//——————————————————————————————————————————————————————————————————————————————
-
-static void receive2 (const CANMessage & inMessage) {
-  Serial.println ("Receive 2") ;
+  /*if(inMessage.len == CAN_LENGTH){
+    switch (inMessage.data[1]) {
+      case ID_STM32-1:
+        mqttClient.publish("arthur/STM32-1", "Receive");
+        mqttClient.loop();
+        break;
+      case ID_STM32-2:
+        mqttClient.publish("arthur/STM32-2", "Receive");
+        mqttClient.loop();
+        break;
+      case ID_STM32-3:
+        mqttClient.publish("arthur/STM32-3", "Receive");
+        mqttClient.loop();
+        break;
+    }*/
+    mqttClient.publish("arthur/receive1", "Receive 1");
+    mqttClient.loop();
 }
 
 //——————————————————————————————————————————————————————————————————————————————

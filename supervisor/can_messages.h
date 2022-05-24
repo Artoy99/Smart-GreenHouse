@@ -10,12 +10,12 @@
 #define ID_BASYS3 0x15
 
 //------------------ frame ID ------------------
-#define DATA_REQUEST 0x111
-#define PERIODICAL_DATA 0x112
-#define ACTUATOR_COMMAND 0x113
-#define PERIOD_CONFIGURATION 0x114
-#define BOARD_ID_CONFIGURATION 0x115
-#define READ_BOARD_ID 0x116
+#define DATA_REQUEST 0x11
+#define PERIODICAL_DATA 0x12
+#define ACTUATOR_COMMAND 0x13
+#define PERIOD_CONFIGURATION 0x14
+#define BOARD_ID_CONFIGURATION 0x15
+#define READ_BOARD_ID 0x16
 
 //------------------ function code ------------------
 #define CAN_LENGTH 8
