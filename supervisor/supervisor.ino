@@ -41,7 +41,11 @@ void loop(){
       sendCAN(ID_STM32_3, ID_FEATHER, ACTUATOR_COMMAND, 0x00, 0x00, 0x00, 0x01);
     }
   }
-  
+
+  if(dataToSend[0] == ID_FEATHER){
+    Serial.println("feather data");
+    reset(dataToSend);
+  }
 
   
   mqttClient.loop();

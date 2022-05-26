@@ -93,20 +93,9 @@ void printMacAddress(byte mac[]) {
 }
 
 void callback ( char *topic , byte *payload , unsigned int length ) {
-  /*Serial.print( "Message arrived [ " );
-  Serial.print(topic ) ;
-  Serial.print( " ]: " ) ;
-  for (int i=0; i<length; i++) {
-    Serial.print(":");
-    Serial.print(i);
-    Serial.print(":");
-    Serial.print(payload[i], HEX);
-  }
-  Serial.println() ;*/
   for (int i=0; i<length; i++) {
     dataToSend[i] = payload[i];
   }
-
   for(int i = 0; i < 8; i++){
     Serial.print(dataToSend[i], HEX);
   }

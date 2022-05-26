@@ -278,3 +278,9 @@ static void receive1 (const CANMessage & inMessage) {
 }
 
 //——————————————————————————————————————————————————————————————————————————————
+
+void reset(uint8_t dataToSend[8]){
+  for(int i = 0; i < 8; i++){
+    dataToSend[i] = 0x00;
+  }
+}

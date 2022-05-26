@@ -31,3 +31,5 @@ void sendCAN(uint8_t receiver_id, uint8_t sender_id, uint8_t frame_id, uint8_t d
 static void receive0 (const CANMessage & inMessage);
 
 static void receive1 (const CANMessage & inMessage);
+
+void reset(uint8_t dataToSend[8]);
