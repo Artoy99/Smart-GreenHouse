@@ -21,5 +21,6 @@
 #define CAN_LENGTH 8
 #define HUM_DATA 0X01
 #define CO2_DATA 0x02
+#define SET_MANUAL 0x03
 
 #endif

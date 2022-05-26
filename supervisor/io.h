@@ -32,4 +32,4 @@ static void receive0 (const CANMessage & inMessage);
 
 static void receive1 (const CANMessage & inMessage);
 
-void reset(uint8_t dataToSend[8]);
+void resetDataToSend(uint8_t dataToSend[8]);

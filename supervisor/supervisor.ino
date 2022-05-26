@@ -2,7 +2,7 @@
 
 int hum = 0;
 int temp = 0;
-bool manual = false;
+uint8_t manual = 0x00;
 
 uint8_t dataToSend[8];
 
@@ -24,6 +24,7 @@ void loop(){
   
   while(can.dispatchReceivedMessage())
   {}
+  //Serial.println(manual, HEX);
 
   if(!manual){
     if(temp > 30){
@@ -41,12 +42,37 @@ void loop(){
       sendCAN(ID_STM32_3, ID_FEATHER, ACTUATOR_COMMAND, 0x00, 0x00, 0x00, 0x01);
     }
   }
-
   if(dataToSend[0] == ID_FEATHER){
     Serial.println("feather data");
-    reset(dataToSend);
+    if(dataToSend[2] == SET_MANUAL){
+      manual = dataToSend[4];
+    }
+    resetDataToSend(dataToSend);
+  }else if(dataToSend[0] == ID_STM32_1 || dataToSend[0] == ID_STM32_3 || dataToSend[0] == ID_STM32_3 || dataToSend[0] == ID_BASYS3){
+    Serial.println("network data");
+    sendCAN(dataToSend[0], ID_FEATHER, dataToSend[2], dataToSend[4], dataToSend[5], dataToSend[6], dataToSend[7]);
+    
+    resetDataToSend(dataToSend);
   }
 
+  /*switch(dataToSend[0]){
+    case ID_FEATHER:
+      Serial.println("feather data");
+      break;
+    case ID_STM32_1:
+      Serial.println("STM31_1 data");
+      break;
+    case ID_STM32_2:
+      Serial.println("STM31_2 data");
+      break;
+    case ID_STM32_3:
+      Serial.println("STM31_3 data");
+      break;
+    case ID_BASYS3:
+      Serial.println("BASYS3 data");
+      break;
+  }
+  resetDataToSend(dataToSend);*/
   
   mqttClient.loop();
 
@@ -72,4 +98,6 @@ void loop(){
     gSentFrameCount += 1 ;
 
   }*/
+
+  delay(50);
 }

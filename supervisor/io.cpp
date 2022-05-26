@@ -122,7 +122,7 @@ void sendCAN(uint8_t receiver_id, uint8_t sender_id, uint8_t frame_id, uint8_t d
   frame.data[0] = receiver_id;
   frame.data[1] = sender_id;
   frame.data[2] = 0;
-  frame.data[3] = 1;
+  frame.data[3] = 0;
   frame.data[4] = data0;
   frame.data[5] = data1;
   frame.data[6] = data2;
@@ -279,7 +279,7 @@ static void receive1 (const CANMessage & inMessage) {
 
 //——————————————————————————————————————————————————————————————————————————————
 
-void reset(uint8_t dataToSend[8]){
+void resetDataToSend(uint8_t dataToSend[8]){
   for(int i = 0; i < 8; i++){
     dataToSend[i] = 0x00;
   }
