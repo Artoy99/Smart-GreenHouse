@@ -1,8 +1,14 @@
 #include "io.h"
 
+int hum = 0;
+int temp = 0;
+bool manual = false;
+
+uint8_t dataToSend[8];
+
 void setup(){
   beginIO();
-  //mqttSetup();
+  mqttSetup();
   
   lcd.setCursor(0, 1);
   lcd.print("Init done");
@@ -19,47 +25,47 @@ void loop(){
   while(can.dispatchReceivedMessage())
   {}
 
-  //CANMessage frame ;
+  if(!manual){
+    if(temp > 30){
+      //envoie actionneur stop led
+      sendCAN(ID_BASYS3, ID_FEATHER, ACTUATOR_COMMAND, 0x00, 0x00, 0x00, 0x00);
+    }else if(temp < -25){
+      //envoie actionneur start led
+      sendCAN(ID_BASYS3, ID_FEATHER, ACTUATOR_COMMAND, 0x00, 0x00, 0x00, 0x01);
+    }
+    if(hum > 50){
+      //envoie actionneur stop hum
+      sendCAN(ID_STM32_3, ID_FEATHER, ACTUATOR_COMMAND, 0x00, 0x00, 0x00, 0x00);
+    }else if(hum < -25){
+      //envoie actionneur start hum
+      sendCAN(ID_STM32_3, ID_FEATHER, ACTUATOR_COMMAND, 0x00, 0x00, 0x00, 0x01);
+    }
+  }
+  
+
+  
+  mqttClient.loop();
+
+
+  /*
   if (gBlinkLedDate < millis ()) {
     gBlinkLedDate += 5000 ;
     digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
-    //frame.idx = gTransmitBufferIndex ;
-    //gTransmitBufferIndex = (gTransmitBufferIndex + 1) % 3 ;
     switch (gSentFrameCount % 4) {
     case 0 :  // Does not match filter #0
       sendCAN(ID_BASYS3, ID_FEATHER, PERIODICAL_DATA, 0x00, 0x00, 0x00, gSentFrameCount);
-      //frame.id = PERIODICAL_DATA ;
-      //frame.data [0] = ID_BASYS3 ;
-      //frame.len = CAN_LENGTH ;
       break ;
     case 1 :  // Matches filter #0
       sendCAN(ID_FEATHER, ID_FEATHER, PERIODICAL_DATA, 0x00, 0x00, 0x00, gSentFrameCount);
-      //frame.id = PERIODICAL_DATA ;
-      //frame.data [0] = ID_FEATHER ;
-      //frame.len = CAN_LENGTH ;
       break ;
     case 2 :  // Does not match any filter
       sendCAN(0x57, ID_FEATHER, 0x64, 0x00, 0x00, 0x00, gSentFrameCount);
-      //frame.id = 0x564 ;
-      //frame.data [0] = 0x57 ;
-      //frame.len = 1 ;
       break ;
     case 3 :  // Matches filter #1
       sendCAN(ID_FEATHER, ID_FEATHER, 0x64, 0x00, 0x00, 0x00, gSentFrameCount);
-      //frame.id = 0x564 ;
-      //frame.data [0] = ID_FEATHER ;
-      //frame.len = 1 ;
       break ;
     }
     gSentFrameCount += 1 ;
-    /*const bool ok = can.tryToSend (frame) ;
-    if (ok) {
-      gSentFrameCount += 1 ;
-    }
-      Serial.print ("Sent: ") ;
-      Serial.println (gSentFrameCount) ;
-    }else{
-      Serial.println ("Send failure") ;
-    }*/
-  }
+
+  }*/
 }

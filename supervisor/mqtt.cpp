@@ -93,13 +93,24 @@ void printMacAddress(byte mac[]) {
 }
 
 void callback ( char *topic , byte *payload , unsigned int length ) {
-  Serial.print( "Message arrived [ " );
+  /*Serial.print( "Message arrived [ " );
   Serial.print(topic ) ;
   Serial.print( " ]: " ) ;
   for (int i=0; i<length; i++) {
-    Serial.print((char)payload[i]);
+    Serial.print(":");
+    Serial.print(i);
+    Serial.print(":");
+    Serial.print(payload[i], HEX);
   }
-  Serial.println() ;
+  Serial.println() ;*/
+  for (int i=0; i<length; i++) {
+    dataToSend[i] = payload[i];
+  }
+
+  for(int i = 0; i < 8; i++){
+    Serial.print(dataToSend[i], HEX);
+  }
+  Serial.println();
 }
 
 void reconnect() {
@@ -110,9 +121,9 @@ void reconnect() {
     if (mqttClient.connect("arthurClient", "", "", "arthur/will", 0, true, "last will arthur")) {
       Serial.println("connected");
       // Once connected, publish an announcement...
-      mqttClient.publish("arthur/a","hello world");
+      mqttClient.publish("arthur/FEATHER","hello world");
       // ... and resubscribe
-      mqttClient.subscribe("arthur/hello");
+      mqttClient.subscribe("arthur/COMMAND");
       mqttClient.loop();
     }else{
       Serial.print("failed, rc=");
