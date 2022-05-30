@@ -77,9 +77,9 @@ void loop(){
   mqttClient.loop();
 
 
-  /*
+  
   if (gBlinkLedDate < millis ()) {
-    gBlinkLedDate += 5000 ;
+    gBlinkLedDate += 10000 ;
     digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
     switch (gSentFrameCount % 4) {
     case 0 :  // Does not match filter #0
@@ -97,7 +97,7 @@ void loop(){
     }
     gSentFrameCount += 1 ;
 
-  }*/
+  }
 
   delay(50);
 }
