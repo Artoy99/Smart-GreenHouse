@@ -121,7 +121,7 @@ void sendCAN(uint8_t receiver_id, uint8_t sender_id, uint8_t frame_id, uint8_t d
 
   frame.data[0] = receiver_id;
   frame.data[1] = sender_id;
-  frame.data[2] = 0;
+  frame.data[2] = frame_id;
   frame.data[3] = 0;
   frame.data[4] = data0;
   frame.data[5] = data1;

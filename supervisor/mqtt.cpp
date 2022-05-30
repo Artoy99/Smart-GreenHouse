@@ -96,6 +96,7 @@ void callback ( char *topic , byte *payload , unsigned int length ) {
   for (int i=0; i<length; i++) {
     dataToSend[i] = payload[i];
   }
+  //Serial.print("Callback");
   //for(int i = 0; i < 8; i++){
   //  Serial.print(dataToSend[i], HEX);
   //}

@@ -43,43 +43,24 @@ void loop(){
     }
   }
   if(dataToSend[0] == ID_FEATHER){
-    Serial.println("feather data");
+    //Serial.println("feather data");
     if(dataToSend[2] == SET_MANUAL){
       manual = dataToSend[4];
     }
     resetDataToSend(dataToSend);
   }else if(dataToSend[0] == ID_STM32_1 || dataToSend[0] == ID_STM32_3 || dataToSend[0] == ID_STM32_3 || dataToSend[0] == ID_BASYS3){
-    Serial.println("network data");
+    //Serial.println("network data");
     sendCAN(dataToSend[0], ID_FEATHER, dataToSend[2], dataToSend[4], dataToSend[5], dataToSend[6], dataToSend[7]);
     
     resetDataToSend(dataToSend);
   }
-
-  /*switch(dataToSend[0]){
-    case ID_FEATHER:
-      Serial.println("feather data");
-      break;
-    case ID_STM32_1:
-      Serial.println("STM31_1 data");
-      break;
-    case ID_STM32_2:
-      Serial.println("STM31_2 data");
-      break;
-    case ID_STM32_3:
-      Serial.println("STM31_3 data");
-      break;
-    case ID_BASYS3:
-      Serial.println("BASYS3 data");
-      break;
-  }
-  resetDataToSend(dataToSend);*/
   
   mqttClient.loop();
 
 
   
-  if (gBlinkLedDate < millis ()) {
-    gBlinkLedDate += 10000 ;
+  /*if (gBlinkLedDate < millis ()) {
+    gBlinkLedDate += 5000 ;
     digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
     switch (gSentFrameCount % 4) {
     case 0 :  // Does not match filter #0
@@ -96,8 +77,26 @@ void loop(){
       break ;
     }
     gSentFrameCount += 1 ;
-
-  }
+  }*/
+  /*if (gBlinkLedDate < millis ()) {
+    gBlinkLedDate += 5000 ;
+    digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
+    switch (gSentFrameCount % 4) {
+    case 0 :  // Does not match filter #0
+      sendCAN(ID_STM32_3, ID_FEATHER, PERIODICAL_DATA, 0x00, 0x00, 0x00, gSentFrameCount);
+      break ;
+    case 1 :  // Matches filter #0
+      sendCAN(ID_STM32_3, ID_FEATHER, PERIODICAL_DATA, 0x00, 0x00, 0x00, gSentFrameCount);
+      break ;
+    case 2 :  // Does not match any filter
+      sendCAN(ID_STM32_3, ID_FEATHER, 0x64, 0x00, 0x00, 0x00, gSentFrameCount);
+      break ;
+    case 3 :  // Matches filter #1
+      sendCAN(ID_STM32_3, ID_FEATHER, 0x64, 0x00, 0x00, 0x00, gSentFrameCount);
+      break ;
+    }
+    gSentFrameCount += 1 ;
+  }*/
 
   delay(50);
 }
