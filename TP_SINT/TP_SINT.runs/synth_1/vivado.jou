@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Vivado v2021.2 (64-bit)
+# SW Build 3367213 on Tue Oct 19 02:48:09 MDT 2021
+# IP Build 3369179 on Thu Oct 21 08:25:16 MDT 2021
+# Start of session at: Mon May 30 11:31:16 2022
+# Process ID: 13116
+# Current directory: C:/Users/ecx/Documents/TP_SINT_JOST_COLLINEAU/TP_SINT/TP_SINT.runs/synth_1
+# Command line: vivado.exe -log led_manip.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source led_manip.tcl
+# Log file: C:/Users/ecx/Documents/TP_SINT_JOST_COLLINEAU/TP_SINT/TP_SINT.runs/synth_1/led_manip.vds
+# Journal file: C:/Users/ecx/Documents/TP_SINT_JOST_COLLINEAU/TP_SINT/TP_SINT.runs/synth_1\vivado.jou
+# Running On: AI-D106-02, OS: Windows, CPU Frequency: 3000 MHz, CPU Physical cores: 6, Host memory: 16951 MB
+#-----------------------------------------------------------
+source led_manip.tcl -notrace
