@@ -57,11 +57,12 @@ void beginIO(void) {
   settings.mRequestedMode = ACAN2515Settings::LoopBackMode ; // Select loopback mode
   #endif
   const ACAN2515Mask rxm0 = standard2515Mask (0x7FF, 0xFF, 0) ;
-  const ACAN2515Mask rxm1 = standard2515Mask (0, 0xFF, 0) ;
+  const ACAN2515Mask rxm1 = standard2515Mask (0, 0, 0) ;
   const ACAN2515AcceptanceFilter filters [] = {
     {standard2515Filter (PERIODICAL_DATA, ID_FEATHER, 0), receive0},
     {standard2515Filter (PERIODICAL_DATA, ID_FEATHER, 0), receive0},
     {standard2515Filter (0, ID_FEATHER, 0), receive1}
+    //{standard2515Filter (0, 0, 0), receive2}
   } ;
   const uint32_t errorCode = can.begin (settings, [] { can.isr () ; }, rxm0, rxm1, filters, 3);
   if (errorCode == 0) {
@@ -154,17 +155,23 @@ void sendCAN(uint8_t receiver_id, uint8_t sender_id, uint8_t frame_id, uint8_t d
 //——————————————————————————————————————————————————————————————————————————————
 
 static void receive0 (const CANMessage & inMessage) {
-  Serial.println ("Receive 0") ;
-  Serial.print("inMessage.id: ");
-  Serial.println(inMessage.id, HEX);
-  Serial.print("inMessage.data[7]: ");
-  Serial.println(inMessage.data[7], HEX);
-  Serial.println("");
+  //Serial.println ("Receive 0") ;
+  //Serial.print("inMessage.id: ");
+  //Serial.println(inMessage.id, HEX);
+  //Serial.println("");
+
+  uint16_t temp_i = 0;
 
   if(inMessage.len == CAN_LENGTH){
     switch (inMessage.data[1]) {
       case ID_STM32_1:
+        temp_i = (inMessage.data[4] | inMessage.data[5]<<8);
+        Serial.println(inMessage.data[4], HEX);
+        Serial.println(inMessage.data[5], HEX);
+        //temp_f = (byte)temp_i / 10;
+        //char[] dataT = {};
         mqttClient.publish("arthur/STM32_1", "THERM/PERIODICAL_DATA: ");
+        //mqttClient.publish("arthur/STM32_1", (const char *)&(inMessage.data[5]));
         mqttClient.loop();
         break;
       case ID_STM32_2:
@@ -183,6 +190,7 @@ static void receive0 (const CANMessage & inMessage) {
     }
   }
   //mqttClient.publish("arthur/receive0", "Receive 0");
+  //Serial.println("");
   mqttClient.loop();
   
 }
@@ -190,12 +198,14 @@ static void receive0 (const CANMessage & inMessage) {
 //——————————————————————————————————————————————————————————————————————————————
 
 static void receive1 (const CANMessage & inMessage) {
-  /*Serial.println ("Receive 1") ;
+  Serial.println ("Receive 1") ;
   Serial.print("inMessage.id: ");
   Serial.println(inMessage.id, HEX);
-  Serial.print("inMessage.data[7]: ");
-  Serial.println(inMessage.data[7], HEX);
-  Serial.println("");*/
+  for(int i = 0; i<8; i++){
+     Serial.print(inMessage.data[i], HEX);
+  }
+  Serial.println("");
+  Serial.println("");
 
   if(inMessage.len == CAN_LENGTH){
     switch (inMessage.data[1]) {
@@ -275,6 +285,17 @@ static void receive1 (const CANMessage & inMessage) {
   }
   //mqttClient.publish("arthur/receive1", "Receive 1");
   mqttClient.loop();
+}
+
+//——————————————————————————————————————————————————————————————————————————————
+
+static void receive2 (const CANMessage & inMessage){
+  Serial.println ("Receive 2") ;
+  Serial.print("inMessage.id: ");
+  Serial.println(inMessage.id, HEX);
+  Serial.print("inMessage.data[7]: ");
+  Serial.println(inMessage.data[7], HEX);
+  Serial.println("");
 }
 
 //——————————————————————————————————————————————————————————————————————————————

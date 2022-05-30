@@ -2,7 +2,7 @@
 
 int hum = 0;
 int temp = 0;
-uint8_t manual = 0x00;
+uint8_t manual = 0x01;
 
 uint8_t dataToSend[8];
 
@@ -41,18 +41,19 @@ void loop(){
       //envoie actionneur start hum
       sendCAN(ID_STM32_3, ID_FEATHER, ACTUATOR_COMMAND, 0x00, 0x00, 0x00, 0x01);
     }
-  }
-  if(dataToSend[0] == ID_FEATHER){
-    //Serial.println("feather data");
-    if(dataToSend[2] == SET_MANUAL){
-      manual = dataToSend[4];
+  }else{
+    if(dataToSend[0] == ID_FEATHER){
+      //Serial.println("feather data");
+      if(dataToSend[2] == SET_MANUAL){
+        manual = dataToSend[4];
+      }
+      resetDataToSend(dataToSend);
+    }else if(dataToSend[0] == ID_STM32_1 || dataToSend[0] == ID_STM32_3 || dataToSend[0] == ID_STM32_3 || dataToSend[0] == ID_BASYS3){
+      //Serial.println("network data");
+      sendCAN(dataToSend[0], ID_FEATHER, dataToSend[2], dataToSend[4], dataToSend[5], dataToSend[6], dataToSend[7]);
+      
+      resetDataToSend(dataToSend);
     }
-    resetDataToSend(dataToSend);
-  }else if(dataToSend[0] == ID_STM32_1 || dataToSend[0] == ID_STM32_3 || dataToSend[0] == ID_STM32_3 || dataToSend[0] == ID_BASYS3){
-    //Serial.println("network data");
-    sendCAN(dataToSend[0], ID_FEATHER, dataToSend[2], dataToSend[4], dataToSend[5], dataToSend[6], dataToSend[7]);
-    
-    resetDataToSend(dataToSend);
   }
   
   mqttClient.loop();
@@ -64,13 +65,13 @@ void loop(){
     digitalWrite (LED_BUILTIN, !digitalRead (LED_BUILTIN)) ;
     switch (gSentFrameCount % 4) {
     case 0 :  // Does not match filter #0
-      sendCAN(ID_BASYS3, ID_FEATHER, PERIODICAL_DATA, 0x00, 0x00, 0x00, gSentFrameCount);
+      //sendCAN(ID_BASYS3, ID_FEATHER, PERIODICAL_DATA, 0x00, 0x00, 0x00, gSentFrameCount);
       break ;
     case 1 :  // Matches filter #0
       sendCAN(ID_FEATHER, ID_FEATHER, PERIODICAL_DATA, 0x00, 0x00, 0x00, gSentFrameCount);
       break ;
     case 2 :  // Does not match any filter
-      sendCAN(0x57, ID_FEATHER, 0x64, 0x00, 0x00, 0x00, gSentFrameCount);
+      sendCAN(0X57, ID_FEATHER, 0x64, 0x00, 0x00, 0x00, gSentFrameCount);
       break ;
     case 3 :  // Matches filter #1
       sendCAN(ID_FEATHER, ID_FEATHER, 0x64, 0x00, 0x00, 0x00, gSentFrameCount);
